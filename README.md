@@ -1,2 +1,2 @@
 "# ChaoDB" 
-## a home made database with jfx GUI
+## A home made database with javafx GUI
