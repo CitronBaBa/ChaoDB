@@ -96,13 +96,8 @@ class Table implements Serializable
     }
 
     public boolean rowEntry(String values)
-    {   // nasty way to process (1,ss,1.0) like string input
-        if(values.charAt(0)!='(' || values.charAt(values.length()-1)!=')') return false;
-        String[] entrys = values.split(",");
-        int len = entrys.length;
-        entrys[0] = entrys[0].substring(1);
-        entrys[len-1] = entrys[len-1].substring(0,entrys[len-1].length()-1);
-
+    {   String[] entrys = String_handler.processRowEntry(values);
+        if(entrys == null) return false;
         if(entrys.length!=width)
         {   System.out.println("Wrong number inputs for one row of this table");
             return false;
@@ -112,7 +107,6 @@ class Table implements Serializable
         if(!rowNewKeycheck(entrys)) return false;
 
         rowWrite(entrys);
-        size++;
         return true;
     }
 
@@ -135,6 +129,7 @@ class Table implements Serializable
         {   c.add(entrys[i]);
             i++;
         }
+        size++;
     }
 
     public void printTable()

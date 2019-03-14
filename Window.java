@@ -6,10 +6,6 @@ import javafx.scene.*;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.beans.value.*;
-//// TODOLIST
-// del/enter col refined in talbewindow
-// regex for (,,)could be refined, and could be moved to String_handler
-//int out of range problem can be adressed
 
 public class Window extends Application
 {   private Control database = new Control("Untitled");
