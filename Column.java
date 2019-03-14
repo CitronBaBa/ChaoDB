@@ -52,21 +52,42 @@ public class Column implements Serializable
 
 // check whether the whole column has no duplicate value
     public boolean keyConstrainCheck()
-    {   if(!iskey) return true;
+    {   List datalist = giveData();
+        if(!iskey) return true;
         HashSet<String> record = new HashSet<>();
-        for(int i=0;i<data.size();i++)
+        for(int i=0;i<datalist.size();i++)
         {   String value;
-            if(data.get(i)==null) value = "null";
-            value = data.get(i).toString();
+            if(datalist.get(i)==null) value = "null";
+            value = datalist.get(i).toString();
             if(!record.add(value)) return false;
         }
         return true;
     }
 
+    public List giveData(){   return null; };
     public String get(int index){ return null; } ;
     public void add(String vale){};
     public void remove(int index){};
     public boolean contains(String value){ return false;};
+
+    public static void main(String[] args)
+    {   Column testing = new Column(null,null,false);
+        testing.test();
+        System.out.println("test passed");
+    }
+
+    private void test()
+    {   StringColumn testCol = new StringColumn(TYPE.strings,"testCol",true);
+        testCol.add("fish");testCol.add("food");testCol.add("steak");
+        testCol.add("lemon");testCol.add("barbecue");testCol.add("lobster");
+        testCol.add("lobster");
+        assert(testCol.contains("fish"));
+        assert(testCol.keyConstrainCheck()==false);
+        testCol.remove(6);
+        assert(testCol.keyConstrainCheck()==true);
+        assert(testCol.newKeyCheck("fish")==false);
+        assert(testCol.newKeyCheck("oyster")==true);
+    }
 
     static class StringColumn extends Column
     {   private static final long serialVersionUID = 1000L;
@@ -89,6 +110,7 @@ public class Column implements Serializable
         public void remove(int index)
         {   data.remove(index);
         }
+        public List giveData(){   return this.data; };
     }
 
     static class FloatColumn extends Column
@@ -112,6 +134,7 @@ public class Column implements Serializable
         public void remove(int index)
         {   data.remove(index);
         }
+        public List giveData(){   return this.data; };
     }
 
     static class BooleanColumn extends Column
@@ -135,6 +158,7 @@ public class Column implements Serializable
         public void remove(int index)
         {   data.remove(index);
         }
+        public List giveData(){   return this.data; };
     }
 
     //int out of range problem can be adressed
@@ -159,6 +183,7 @@ public class Column implements Serializable
         public void remove(int index)
         {   data.remove(index);
         }
+        public List giveData(){   return this.data;};
     }
 
 }

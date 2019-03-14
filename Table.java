@@ -132,7 +132,21 @@ class Table implements Serializable
         size++;
     }
 
-    public void printTable()
+    private void commandLineMode()
+    {   addColumn("int","lobster","false");
+        addColumn("string","basil","false");
+        addColumn("float","pork","false");
+
+        Scanner scan0 = new Scanner(System.in);
+        while(true)
+        {   System.out.println("(input0:int, input1:string, input2:float, .....)");
+            String value = scan0.nextLine();
+            if(!rowEntry(value)) System.out.println("row entry failed");
+            printTable();
+        }
+    }
+
+    private void printTable()
     {   for(int i=0;i<size;i++)
         {   System.out.print("  ");
             for(Column c : lib)
@@ -143,18 +157,27 @@ class Table implements Serializable
     }
 
     public static void main(String[] args)
-    {   Table t = new Table("lobster");
-        t.addColumn("int","lobster","false");
-        t.addColumn("string","basil","false");
-        t.addColumn("float","pork","false");
-
-        Scanner scan0 = new Scanner(System.in);
-        while(true)
-        {   System.out.println("input0, input1, input2, .....");
-            String value = scan0.nextLine();
-            if(!t.rowEntry(value)) System.out.println("row entry failed");
-            t.printTable();
+    {   if(args.length!=0)
+        {   Table t = new Table("testcmd");
+            if(args[0].equals("enter")) t.commandLineMode();
         }
+        Table t = new Table("test");
+        t.test();
+        System.out.println("test passed");
+    }
+
+    private void test()
+    {   addColumn("float","weight","false");
+        addColumn("int","id","true");
+        addColumn("string","name","false");
+        addColumn("boolean","female","false");
+        assert(lib.get(0).getClass().equals(Column.FloatColumn.class));
+        assert(lib.get(1).getClass().equals(Column.IntColumn.class));
+        assert(lib.get(2).getClass().equals(Column.StringColumn.class));
+        assert(lib.get(3).getClass().equals(Column.BooleanColumn.class));
+        rowEntry("(0.1,1,Tracy,true)");
+        assert(size==1);
+        assert(width==4);
     }
 
 }

@@ -1,8 +1,10 @@
 import java.util.*;
 import java.io.*;
 
-// using Object/Object[] to make this class independent
-// from the object type, avoid dependecies
+/* Do the job of saving tables to a folder with individual table file
+   using Object/Object[] to make this class independent
+   from the object type, making it more reusable
+*/
 
 class FileSystem
 {   private String root = "./data/";
@@ -30,6 +32,14 @@ class FileSystem
         {   result[i] = readfrom(dir+"/"+files[i].getName());
         }
         return result;
+    }
+
+    public void deleteDatabase(String foldername)
+    {   File dir = new File(root+foldername);
+        for(File f : dir.listFiles())
+        {   f.delete();
+        }
+        dir.delete();
     }
 
     public Object readfrom(String filename)
@@ -75,32 +85,59 @@ class FileSystem
 
     public static void main(String[] args)
     {   FileSystem handler = new FileSystem();
-        Person cecile = new Person();
-        Person cecile2 = new Person();
+        handler.test();
+        System.out.println("test passed");
+    }
+
+    private void test()
+    {   groupTest();
+        singleTest();
+    }
+
+    private void singleTest()
+    {   Testclass cecile = new Testclass("Cecile");
+        writeto("file2",cecile);
+        Testclass cecilecopy = (Testclass)readfrom("file2");
+        assert(cecilecopy.name.equals("Cecile"));
+        assert(cecilecopy.subclass.name.equals("inteli"));
+        File testfile = new File("file2");
+        testfile.delete();
+    }
+
+    private void groupTest()
+    {   Testclass[] listofTestclass = testPreparation();
+        assert(listofTestclass[0].name.equals("Cecile"));
+        assert(listofTestclass[1].name.equals("Daisy"));
+        assert(listofTestclass[0].subclass.name.equals("inteli"));
+        deleteDatabase("testDbFile");
+    }
+
+    private Testclass[] testPreparation()
+    {   Testclass cecile = new Testclass("Cecile");
+        Testclass daisy = new Testclass("Daisy");
         ArrayList<Object> people = new ArrayList<>();
-        people.add(cecile); people.add(cecile2);
+        people.add(cecile); people.add(daisy);
         ArrayList<String> names = new ArrayList<>();
-        names.add("p1");names.add("p2");
+        names.add("testfile1");names.add("testfile2");
 
-        handler.saveDatabase("people",people,names);
-        Object[] result = handler.readDatabase("people");
-        Person[] listofpeople = new Person[result.length];
+        saveDatabase("testDbFile",people,names);
+        Object[] result = readDatabase("testDbFile");
+        Testclass[] listofpeople = new Testclass[result.length];
         for(int i=0;i<listofpeople.length;i++)
-        {   listofpeople[i] = (Person)result[i];
-            System.out.println(listofpeople[i].name);
+        {   listofpeople[i] = (Testclass)result[i];
         }
-
-        handler.writeto("file2.txt",cecile);
-        Person cecilia = (Person)handler.readfrom("file2.txt");
-        System.out.println(cecilia.brain.name);
+        return listofpeople;
     }
 }
 
 // class for testing
-class Person implements Serializable
-{   public String name = "Cecile";
-    public Brain brain = new Brain();
+class Testclass implements Serializable
+{   public String name;
+    public Testsubclass subclass = new Testsubclass();
+    Testclass(String name)
+    {   this.name = name;
+    }
 }
-class Brain implements Serializable
+class Testsubclass implements Serializable
 {   public String name = "inteli";
 }

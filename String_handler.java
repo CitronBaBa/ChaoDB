@@ -106,7 +106,7 @@ class String_handler
 
     private void testJudgeType()
     {   assert(typeJudge("1")==TYPE.ints);
-        assert(typeJudge("13333333")==TYPE.ints);
+        assert(typeJudge("+13333333")==TYPE.ints);
         assert(typeJudge("-13333333")==TYPE.ints);
         assert(typeJudge("2147483647")==TYPE.ints);
         assert(typeJudge("-2147483648")==TYPE.ints);
