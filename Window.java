@@ -24,8 +24,8 @@ public class Window extends Application
 
     private TableHoverPanel tableglance;
     private Stage mainwindow;
-    private int x0 = 0, y0 = 2;
-    private int x = 0, y = 2;
+    private int x0 = 0, y0 = 1;
+    private int x = 0, y = 1;
 
     public static void main(String[] args)
     {   launch(args);
@@ -35,12 +35,12 @@ public class Window extends Application
     {   topgrid.setPadding(new Insets(5,5,5,5));
         topgrid.setVgap(5);
         topgrid.setHgap(5);
-        buttonGrid.setPadding(new Insets(25,5,5,5));
+        buttonGrid.setPadding(new Insets(10,5,10,5));
         buttonGrid.setVgap(5);
         buttonGrid.setHgap(5);
+        buttonGrid.setId("GridPane_button");
 
      // intial set-up
-        tableOperation();
         addingButton();
         loadingButton();
         savingButton();
@@ -51,26 +51,37 @@ public class Window extends Application
 
         layoutbox.getChildren().addAll(topgrid,buttonGrid);
         Scene scene0 = new Scene(layoutbox,350,450);
+        scene0.getStylesheets().add("./style.css");
         mainwindow = window0;
         window0.setScene(scene0);
-        window0.setTitle("ChaoDB: "+database.getname());
+        updateDatabaseName();
         window0.show();
+
+     // display demo database
+        tableDemoInit();
     }
 
     private void hoverlisten(Button btn, Table table)
     {   btn.hoverProperty().addListener
         ((ObservableValue<? extends Boolean> observable, Boolean oldhovered, Boolean newhovered)
          -> {   if (newhovered)
-                {   if(tableglance!=null)
-                    {   if(tableglance.getTable().equals(table))
-                        return;
-                        layoutbox.getChildren().remove(tableglance.getpanel());
-                    }
-                    tableglance = new TableHoverPanel(table);
-                    layoutbox.getChildren().add(tableglance.getpanel());
+                {   hoverListen(table);
                 }
             }
         );
+    }
+
+    private void hoverListen(Table table)
+    {   if(tableglance!=null)
+        {   if(tableglance.getTable().equals(table)) return;
+            layoutbox.getChildren().remove(tableglance.getpanel());
+        }
+        displayTableHoverPanle(table);
+    }
+
+    private void displayTableHoverPanle(Table table)
+    {   tableglance = new TableHoverPanel(table);
+        layoutbox.getChildren().add(tableglance.getpanel());
     }
 
     private void tableNameFiled()
@@ -125,14 +136,14 @@ public class Window extends Application
         topgrid.getChildren().add(btn);
     }
 
+    private void updateDatabaseName()
+    {   mainwindow.setTitle("ChaoDB: "+database.getname());
+    }
+
     private void addtogrid(Button btn)
     {   GridPane.setConstraints(btn,x,y);
         positioning();
-        topgrid.getChildren().add(btn);
-    }
-
-    private void updateDatabaseName()
-    {   mainwindow.setTitle("ChaoDB: "+database.getname());
+        buttonGrid.getChildren().add(btn);
     }
 
     private void positioning()
@@ -157,6 +168,9 @@ public class Window extends Application
         btn.setOnAction(e->
         {   TableWindow newview = new TableWindow(table);
             newview.launch();
+            // refrash the table hover panel
+            layoutbox.getChildren().remove(tableglance.getpanel());
+            displayTableHoverPanle(table);
         });
         hoverlisten(btn,table);
         addtogrid(btn);
@@ -176,33 +190,9 @@ public class Window extends Application
         }
     }
 
-    private void tableOperation()
-    {   addNewTable("Barbecue");
-        tableInit(database.getTable("Barbecue"));
-
-        addNewTable("Hong JiaYi");
-        tableInit2(database.getTable("Hong JiaYi"));
-    }
-
-    private void tableInit(Table t)
-    {   t.addColumn("int","lobster","false");
-        t.addColumn("string","basil","false");
-        t.addColumn("float","pork","false");
-        t.addColumn("float","lamb","false");
-        t.rowEntry("(1,ohlala,3.1415,2.0)");
-        t.rowEntry("(40,limousine,3.1415,3.0)");
-        t.rowEntry("(25,steak,3.34415,3.0)");
-        t.rowEntry("(25,steak,3.34415,3.231)");
-    }
-
-    private void tableInit2(Table t)
-    {   t.addColumn("string","Family Name","false");
-        t.addColumn("string","First Name","false");
-        t.addColumn("string","description","false");
-        t.addColumn("boolean","idiot","false");
-        t.rowEntry("(Hong,Jiayi,is a jerk,true)");
-        t.rowEntry("(Hong,Jiayi,is a fool,true)");
-        t.rowEntry("(Hong,Jiayi,has no brain,true)");
-        t.rowEntry("(Wang,Chao,is a genius,false)");
+    private void tableDemoInit()
+    {   if(!database.readfrom("demo")) return;
+        loadfromDatabase();
+        updateDatabaseName();
     }
 }

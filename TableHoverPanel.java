@@ -30,8 +30,8 @@ public class TableHoverPanel
         typeColumn.setCellValueFactory(cell-> new SimpleObjectProperty<>(cell.getValue().getType()));
         panel.getColumns().add(typeColumn);
 
-        TableColumn<ColumnEntry,Integer> sizeColumn = new TableColumn<>("Size");
-        sizeColumn.setCellValueFactory(cell-> new SimpleObjectProperty<>(cell.getValue().getSize()));
+        TableColumn<ColumnEntry,Boolean> sizeColumn = new TableColumn<>("Is Key?");
+        sizeColumn.setCellValueFactory(cell-> new SimpleObjectProperty<>(cell.getValue().getIskey()));
         panel.getColumns().add(sizeColumn);
 
         panel.setItems(loadDataFromTable());
@@ -43,8 +43,8 @@ public class TableHoverPanel
         for(int i=0;i<tablehovered.getwidth();i++)
         {   String name = tablehovered.getColName(i);
             String type = String_handler.typeToString(tablehovered.getColType(i));
-            int size = tablehovered.getsize();
-            colEntries.add(new ColumnEntry(name,type,size));
+            boolean iskey = tablehovered.getColIskey(i);
+            colEntries.add(new ColumnEntry(name,type,iskey));
         }
         return colEntries;
     }
@@ -52,23 +52,15 @@ public class TableHoverPanel
     private static class ColumnEntry
     {   private String name;
         private String type;
-        private int size;
-        public ColumnEntry()
-        {   this.name = "";
-            this.type = "";
-            this.size = 0;
-        }
-        public ColumnEntry(String name, String type, int size)
+        private boolean iskey;
+        public ColumnEntry(String name, String type, boolean iskey)
         {   this.name = name;
             this.type = type;
-            this.size = size;
+            this.iskey = iskey;
         }
         public String getName() {   return name;}
         public String getType() {   return type;}
-        public int getSize() {   return size;}
-        public void setName(String name){   this.name = name;}
-        public void setType(String type){   this.type = type;}
-        public void setSize(int size){   this.size = size;}
+        public boolean getIskey() {   return iskey;}
     }
 
 }

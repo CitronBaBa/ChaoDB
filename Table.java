@@ -23,6 +23,10 @@ class Table implements Serializable
     {   return lib.get(index).getype();
     }
 
+    public boolean getColIskey(int index)
+    {   return lib.get(index).iskey();
+    }
+
     public List<String> query(int index)
     {   if(index>size)
         {   System.out.println("query index is out of range");
