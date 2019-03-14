@@ -23,6 +23,7 @@ class FileSystem
     public Object[] readDatabase(String foldername)
     {   File dir = new File(root+foldername);
         if(!dir.exists()) return null;
+        if(foldername.equals("")) return null;
         File[] files = dir.listFiles();
         Object[] result = new Object[files.length];
         for(int i=0;i<files.length;i++)

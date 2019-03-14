@@ -7,10 +7,10 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.beans.value.*;
 //// TODOLIST
-// setting serial number
 // del/enter col refined in talbewindow
 // regex for (,,)could be refined, and could be moved to String_handler
 //int out of range problem can be adressed
+
 public class Window extends Application
 {   private Control database = new Control("Untitled");
     private VBox layoutbox = new VBox();
@@ -40,7 +40,7 @@ public class Window extends Application
         buttonGrid.setHgap(5);
 
      // intial set-up
-        table_operation();
+        tableOperation();
         addingButton();
         loadingButton();
         savingButton();
@@ -62,7 +62,7 @@ public class Window extends Application
         ((ObservableValue<? extends Boolean> observable, Boolean oldhovered, Boolean newhovered)
          -> {   if (newhovered)
                 {   if(tableglance!=null)
-                    {   if(tableglance.get_table().getname().equals(table.getname()))
+                    {   if(tableglance.getTable().equals(table))
                         return;
                         layoutbox.getChildren().remove(tableglance.getpanel());
                     }
@@ -94,7 +94,7 @@ public class Window extends Application
     private void addingButton()
     {   Button btn = new Button("Add Table");
         btn.setOnAction(e->
-        {   add_new_table(tablenameField.getText());
+        {   if(!addNewTable(tablenameField.getText())) return;
             tablenameField.clear();
         });
         GridPane.setConstraints(btn,2,0);
@@ -104,8 +104,8 @@ public class Window extends Application
     private void loadingButton()
     {   Button btn = new Button("Load From");
         btn.setOnAction(e->
-        {   clearTableBtns();
-            database.readfrom(LoadDbnameField.getText());
+        {   if(!database.readfrom(LoadDbnameField.getText())) return;
+            clearTableBtns();
             LoadDbnameField.clear();
             loadfromDatabase();
             updateDatabaseName();
@@ -117,10 +117,8 @@ public class Window extends Application
     private void savingButton()
     {   Button btn = new Button("Save As");
         btn.setOnAction(e->
-        {   if(!String_handler.judgeDbName(SaveDbnameField.getText())) return;
-            database.setname(SaveDbnameField.getText());
+        {   if(!database.savetodisk(SaveDbnameField.getText())) return;
             SaveDbnameField.clear();
-            database.savetodisk();
             updateDatabaseName();
         });
         GridPane.setConstraints(btn,2,0);
@@ -145,12 +143,13 @@ public class Window extends Application
         else x++;
     }
 
-    private void add_new_table(String name)
-    {   if(!database.add_table(name)) return;
-        table_button(name,database.get_table(name));
+    private boolean addNewTable(String name)
+    {   if(!database.addTable(name)) return false;
+        tableButton(name,database.getTable(name));
+        return true;
     }
 
-    private Button table_button(String name, Table table)
+    private Button tableButton(String name, Table table)
     {   Button btn = new Button(name);
         tableBtns.add(btn);
         btn.setStyle("-fx-text-fill: rgb(88,144,255); -fx-font-weight: bold;");
@@ -173,37 +172,37 @@ public class Window extends Application
 
     private void loadfromDatabase()
     {   for(Table t : database.getAllTables())
-        {   table_button(t.getname(),t);
+        {   tableButton(t.getname(),t);
         }
     }
 
-    private void table_operation()
-    {   add_new_table("Barbecue");
-        table_init(database.get_table("Barbecue"));
+    private void tableOperation()
+    {   addNewTable("Barbecue");
+        tableInit(database.getTable("Barbecue"));
 
-        add_new_table("Hong JiaYi");
-        table_init2(database.get_table("Hong JiaYi"));
+        addNewTable("Hong JiaYi");
+        tableInit2(database.getTable("Hong JiaYi"));
     }
 
-    private void table_init(Table t)
-    {   t.add_column("int","lobster","false");
-        t.add_column("string","basil","false");
-        t.add_column("float","pork","false");
-        t.add_column("float","lamb","false");
-        t.row_entry("(1,ohlala,3.1415,2.0)");
-        t.row_entry("(40,limousine,3.1415,3.0)");
-        t.row_entry("(25,steak,3.34415,3.0)");
-        t.row_entry("(25,steak,3.34415,3.231)");
+    private void tableInit(Table t)
+    {   t.addColumn("int","lobster","false");
+        t.addColumn("string","basil","false");
+        t.addColumn("float","pork","false");
+        t.addColumn("float","lamb","false");
+        t.rowEntry("(1,ohlala,3.1415,2.0)");
+        t.rowEntry("(40,limousine,3.1415,3.0)");
+        t.rowEntry("(25,steak,3.34415,3.0)");
+        t.rowEntry("(25,steak,3.34415,3.231)");
     }
 
-    private void table_init2(Table t)
-    {   t.add_column("string","Family Name","false");
-        t.add_column("string","First Name","false");
-        t.add_column("string","description","false");
-        t.add_column("boolean","idiot","false");
-        t.row_entry("(Hong,Jiayi,is a jerk,true)");
-        t.row_entry("(Hong,Jiayi,is a fool,true)");
-        t.row_entry("(Hong,Jiayi,has no brain,true)");
-        t.row_entry("(Wang,Chao,is a genius,false)");
+    private void tableInit2(Table t)
+    {   t.addColumn("string","Family Name","false");
+        t.addColumn("string","First Name","false");
+        t.addColumn("string","description","false");
+        t.addColumn("boolean","idiot","false");
+        t.rowEntry("(Hong,Jiayi,is a jerk,true)");
+        t.rowEntry("(Hong,Jiayi,is a fool,true)");
+        t.rowEntry("(Hong,Jiayi,has no brain,true)");
+        t.rowEntry("(Wang,Chao,is a genius,false)");
     }
 }

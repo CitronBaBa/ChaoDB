@@ -10,7 +10,7 @@ class Control
     public String getname() {   return name;}
     public void setname(String name) {   this.name = name;}
 
-    public boolean add_table(String name)
+    public boolean addTable(String name)
     {   if(tables.containsKey(name)) return false;
         if(!String_handler.judgeTbName(name)) return false;
 
@@ -19,11 +19,11 @@ class Control
         return true;
     }
 
-    public void remove_table(String name)
+    public void removeTable(String name)
     {   tables.remove(name);
     }
 
-    public Table get_table(String name)
+    public Table getTable(String name)
     {   return tables.get(name);
     }
 
@@ -35,8 +35,11 @@ class Control
         return tables;
     }
 
-    public void savetodisk()
-    {   ArrayList<Object> tables = new ArrayList<>();
+    public boolean savetodisk(String databasename)
+    {   if(!String_handler.judgeDbName(databasename)) return false;
+        name = databasename;
+
+        ArrayList<Object> tables = new ArrayList<>();
         ArrayList<String> tablenames = new ArrayList<>();
         for (Map.Entry<String, Table> pair : this.tables.entrySet())
         {   tablenames.add(pair.getKey());
@@ -45,12 +48,14 @@ class Control
 
         FileSystem filehandler = new FileSystem();
         filehandler.saveDatabase(name,tables,tablenames);
+        return true;
     }
 
 // return false when there is no such filename
     public boolean readfrom(String databaseName)
-    {   FileSystem filehandler = new FileSystem();
+    {   if(!String_handler.judgeDbName(databaseName)) return false;
 
+        FileSystem filehandler = new FileSystem();
         Object[] result = filehandler.readDatabase(databaseName);
         if(result==null) return false;
         Table[] readtables = new Table[result.length];

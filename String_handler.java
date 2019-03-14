@@ -1,12 +1,12 @@
 class String_handler
 {   public static void main(String[] args)
-    {   if(type_judge(args[0])==TYPE.ints) System.out.println("it is a integer");
-        if(type_judge(args[0])==TYPE.floats) System.out.println("it is a float");
-        if(type_judge(args[0])==TYPE.booleans) System.out.println("it is a boolean");
-        if(type_judge(args[0])==TYPE.strings) System.out.println("it is a string");
+    {   if(typeJudge(args[0])==TYPE.ints) System.out.println("it is a integer");
+        if(typeJudge(args[0])==TYPE.floats) System.out.println("it is a float");
+        if(typeJudge(args[0])==TYPE.booleans) System.out.println("it is a boolean");
+        if(typeJudge(args[0])==TYPE.strings) System.out.println("it is a string");
     }
 
-    public static TYPE type_read(String userchoice)
+    public static TYPE typeRead(String userchoice)
     {   if(userchoice.equals("int")) return TYPE.ints;
         if(userchoice.equals("float")) return TYPE.floats;
         if(userchoice.equals("string")) return TYPE.strings;
@@ -14,7 +14,7 @@ class String_handler
         return null;
     }
 
-    public static String type_to_string(TYPE type)
+    public static String typeToString(TYPE type)
     {   if(type==TYPE.ints) return "int";
         if(type==TYPE.floats) return "float";
         if(type==TYPE.strings) return "string";
@@ -40,7 +40,7 @@ class String_handler
     // no support for long
     // no support for double, ".0" "0." are illegal
 
-    public static TYPE type_judge(String value)
+    public static TYPE typeJudge(String value)
     {   boolean num = true;
         boolean inte = true;
         boolean decimal = false;

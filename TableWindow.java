@@ -25,7 +25,7 @@ public class TableWindow
     public void launch()
     {   window.initModality(Modality.APPLICATION_MODAL);
 
-        add_viewcolumns();
+        addViewcolumns();
         tableview.setItems(loadtable());
 
         //exit button
@@ -47,7 +47,7 @@ public class TableWindow
         hbox.setSpacing(5);
         for(int i=0;i<table.getwidth();i++)
         {   TextField input = new TextField();
-            input.setPromptText(table.get_col_name(i));
+            input.setPromptText(table.getColName(i));
             hbox.getChildren().add(input);
             inputs.add(input);
         }
@@ -83,11 +83,11 @@ public class TableWindow
 
         Button add = new Button("ADD");
         add.setMinWidth(55);
-        add.setOnAction(e->col_add());
+        add.setOnAction(e->colAdd());
         hbox.getChildren().add(add);
 
         Button del = new Button("DEL");
-        del.setOnAction(e->col_del());
+        del.setOnAction(e->colDel());
         del.setMinWidth(55);
         hbox.getChildren().add(del);
         return hbox;
@@ -96,27 +96,27 @@ public class TableWindow
 // column operation only add/remove at the end of the list
 // add/remove arbitrary column not supported yet
 
-    private void col_add()
+    private void colAdd()
     {   String type = colinputs.get(0).getText();
         String name = colinputs.get(1).getText();
         String iskey = colinputs.get(2).getText();
-        if(!table.add_column(type,name,iskey)) return;
+        if(!table.addColumn(type,name,iskey)) return;
         // reload all the buffers to the view
         tableview.setItems(loadtable());
 
         //add at the end
         int index = table.getwidth()-1;
-        add_viewcolumn(index);
+        addViewcolumn(index);
         TextField newfield = new TextField();
-        newfield.setPromptText(table.get_col_name(index));
+        newfield.setPromptText(table.getColName(index));
         inputs.add(newfield);
         hbox.getChildren().add(hbox.getChildren().size()-2,newfield);
     }
 
-    private void col_del()
-    {   if(!table.del_column()) return;
+    private void colDel()
+    {   if(!table.delColumn()) return;
         tableview.setItems(loadtable());
-        del_viewcolumn();
+        delViewcolumn();
         inputs.remove(inputs.size()-1);
         hbox.getChildren().remove(hbox.getChildren().size()-3);
     }
@@ -138,7 +138,7 @@ public class TableWindow
         }
         for(int index : indexs)
         {   all.remove(index);
-            table.delete_row(index);
+            table.deleteRow(index);
         }
     }
 
@@ -153,30 +153,30 @@ public class TableWindow
         inputstring = inputstring.substring(1);
         inputstring = "("+inputstring+")";
         //type check and write to databse
-        if(!table.row_entry(inputstring)) return;
+        if(!table.rowEntry(inputstring)) return;
         // write to buffer
-        tableview.getItems().add(buffer_assemble(table.getsize()-1));
+        tableview.getItems().add(bufferAssemble(table.getsize()-1));
     }
 
 
-    private void add_viewcolumns()
+    private void addViewcolumns()
     {   for(int i=0;i<table.getwidth();i++)
-        {  add_viewcolumn(i);
+        {  addViewcolumn(i);
         }
     }
 
-    private void add_viewcolumn(int col_index)
-    {   tableview.getColumns().add(create_column(col_index));
+    private void addViewcolumn(int col_index)
+    {   tableview.getColumns().add(createColumn(col_index));
     }
 
-    private void del_viewcolumn()
+    private void delViewcolumn()
     {   int index = tableview.getColumns().size()-1;
         tableview.getColumns().remove(index);
     }
 
 // this version is dynamic, there is a binding between cell and buffer
-    private TableColumn<Buffer,String> create_column(int col_index)
-    {   TableColumn<Buffer,String> col = new TableColumn<>(table.get_col_name(col_index));
+    private TableColumn<Buffer,String> createColumn(int col_index)
+    {   TableColumn<Buffer,String> col = new TableColumn<>(table.getColName(col_index));
         col.setCellValueFactory(param ->
         {   return Bindings.createObjectBinding
             (  ()->{ return (param.getValue().valueProperty(col_index).getValue());}
@@ -208,12 +208,12 @@ public class TableWindow
     private ObservableList<Buffer> loadtable()
     {   ObservableList<Buffer> buffers = FXCollections.observableArrayList();
         for(int i=0;i<table.getsize();i++)
-        {   buffers.add(buffer_assemble(i));
+        {   buffers.add(bufferAssemble(i));
         }
         return buffers;
     }
 
-    private Buffer buffer_assemble(int index)
+    private Buffer bufferAssemble(int index)
     {   Buffer buffer = new Buffer(table.query(index));
         return buffer;
     }

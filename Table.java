@@ -2,7 +2,8 @@ import java.util.*;
 import java.io.*;
 
 class Table implements Serializable
-{   private List<Column> lib = new LinkedList<>();
+{   private static final long serialVersionUID = 1000L;
+    private List<Column> lib = new LinkedList<>();
     private int size = 0;
     private int width = 0;
     private String name;
@@ -14,11 +15,11 @@ class Table implements Serializable
     public int getwidth() { return width;}
     public String getname() { return name;}
 
-    public String get_col_name(int index)
+    public String getColName(int index)
     {   return lib.get(index).getname();
     }
 
-    public TYPE get_col_type(int index)
+    public TYPE getColType(int index)
     {   return lib.get(index).getype();
     }
 
@@ -35,30 +36,30 @@ class Table implements Serializable
         return answer;
     }
 
-    public void delete_row(int index)
+    public void deleteRow(int index)
     {   for(Column c: lib)
         {   c.remove(index);
         }
         size--;
     }
 
-    public boolean add_column(String typechoice, String col_name, String iskeychoice)
-    {   if(String_handler.type_judge(iskeychoice)!=TYPE.booleans) return false;
+    public boolean addColumn(String typechoice, String col_name, String iskeychoice)
+    {   if(String_handler.typeJudge(iskeychoice)!=TYPE.booleans) return false;
         Boolean iskey = String_handler.toboolean(iskeychoice);
 
         //empty key field column cannot be added afterwards
         if(iskey && size>0) return false;
 
-        TYPE type = String_handler.type_read(typechoice);
+        TYPE type = String_handler.typeRead(typechoice);
         if(type==null) return false;
         if(type==TYPE.ints)
-        {   Int_column id = new Int_column(type,col_name,iskey);  lib.add(id);}
+        {   Column.IntColumn id = new Column.IntColumn(type,col_name,iskey);  lib.add(id);}
         if(type==TYPE.strings)
-        {   String_column id = new String_column(type,col_name,iskey); lib.add(id);}
+        {   Column.StringColumn id = new Column.StringColumn(type,col_name,iskey); lib.add(id);}
         if(type==TYPE.floats)
-        {   Float_column id = new Float_column(type,col_name,iskey); lib.add(id);}
+        {   Column.FloatColumn id = new Column.FloatColumn(type,col_name,iskey); lib.add(id);}
         if(type==TYPE.booleans)
-        {   Boolean_column id = new Boolean_column(type,col_name,iskey);  lib.add(id);}
+        {   Column.BooleanColumn id = new Column.BooleanColumn(type,col_name,iskey);  lib.add(id);}
         width ++;
 
         //intialize column with null
@@ -68,21 +69,21 @@ class Table implements Serializable
         return true;
     }
 
-    public boolean del_column()
+    public boolean delColumn()
     {   if(width<1) return false;
         lib.remove(width-1);
         width --;
         return true;
     }
 
-    private boolean row_keyconstrain_check()
+    private boolean rowKeyConstrainCheck()
     {   for(Column c : lib)
         {   if(!c.keyConstrainCheck()) return false;
         }
         return true;
     }
 
-    private boolean row_new_keycheck(String[] values)
+    private boolean rowNewKeycheck(String[] values)
     {   for(int i=0;i<width;i++)
         {   Column c = lib.get(i);
             if(!c.newKeyCheck(values[i])) return false;
@@ -90,7 +91,7 @@ class Table implements Serializable
         return true;
     }
 
-    public boolean row_entry(String values)
+    public boolean rowEntry(String values)
     {   // nasty way to process (1,ss,1.0) like string input
         if(values.charAt(0)!='(' || values.charAt(values.length()-1)!=')') return false;
         String[] entrys = values.split(",");
@@ -103,16 +104,16 @@ class Table implements Serializable
             return false;
         }
 
-        if(!row_typecheck(entrys)) return false;
-        if(!row_new_keycheck(entrys)) return false;
+        if(!rowTypecheck(entrys)) return false;
+        if(!rowNewKeycheck(entrys)) return false;
 
-        row_write(entrys);
+        rowWrite(entrys);
         size++;
         return true;
     }
 
 
-    private boolean row_typecheck(String entrys[])
+    private boolean rowTypecheck(String entrys[])
     {   int i = 0;
         for(Column c : lib)
         {   if(!c.typecheck(entrys[i]))
@@ -124,7 +125,7 @@ class Table implements Serializable
         return true;
     }
 
-    private void row_write(String entrys[])
+    private void rowWrite(String entrys[])
     {   int i = 0;
         for(Column c : lib)
         {   c.add(entrys[i]);
@@ -132,7 +133,7 @@ class Table implements Serializable
         }
     }
 
-    public void print_table()
+    public void printTable()
     {   for(int i=0;i<size;i++)
         {   System.out.print("  ");
             for(Column c : lib)
@@ -144,173 +145,17 @@ class Table implements Serializable
 
     public static void main(String[] args)
     {   Table t = new Table("lobster");
-        t.add_column("int","lobster","false");
-        t.add_column("string","basil","false");
-        t.add_column("float","pork","false");
+        t.addColumn("int","lobster","false");
+        t.addColumn("string","basil","false");
+        t.addColumn("float","pork","false");
 
         Scanner scan0 = new Scanner(System.in);
         while(true)
         {   System.out.println("input0, input1, input2, .....");
             String value = scan0.nextLine();
-            if(!t.row_entry(value)) System.out.println("row entry failed");
-            t.print_table();
+            if(!t.rowEntry(value)) System.out.println("row entry failed");
+            t.printTable();
         }
     }
 
-}
-
-class Column implements Serializable
-{   private TYPE type;
-    private String name;
-    private boolean iskey;
-    private List data;
-
-    Column(TYPE type, String name, boolean iskey)
-    {   this.type = type;
-        this.name = name;
-        this.iskey = iskey;
-    }
-
-    public TYPE getype()
-    {   return type;
-    }
-
-    public String getname()
-    {   return name;
-    }
-
-    public boolean iskey()
-    {   return iskey;
-    }
-
-    public boolean typecheck(String value)
-    {   // null item handling
-        if(value.equals(""))
-        {   return true;
-        }
-
-        //string col always gets entered
-        if(type==TYPE.strings)
-        {   return true;
-        }
-
-        //other types
-        if( type != String_handler.type_judge(value) ) return false;
-
-        return true;
-    }
-
-// check whether new value can be a unique key
-    public boolean newKeyCheck(String value)
-    {   if(!iskey)return true;
-        if(contains(value)) return false;
-        return true;
-    }
-
-// check whether the whole column has no duplicate value
-    public boolean keyConstrainCheck()
-    {   if(!iskey) return true;
-        HashSet<String> record = new HashSet<>();
-        for(int i=0;i<data.size();i++)
-        {   String value;
-            if(data.get(i)==null) value = "null";
-            value = data.get(i).toString();
-            if(!record.add(value)) return false;
-        }
-        return true;
-    }
-
-    public String get(int index){ return null; } ;
-    public void add(String vale){};
-    public void remove(int index){};
-    public boolean contains(String value){ return false;};
-}
-
-class String_column extends Column
-{   private List<String> data = new ArrayList<>();
-    public String_column(TYPE type, String name, boolean iskey)
-    {   super(type,name,iskey);
-    }
-    public String get(int index)
-    {   if (data.get(index)==null) return "null";
-        return data.get(index);
-    }
-    public void add(String value)
-    {   if(value.equals("")) data.add(null);
-        else data.add(value);
-    }
-    public boolean contains(String value)
-    {   if(value.equals("")) return data.contains(null);
-        return data.contains(value);
-    }
-    public void remove(int index)
-    {   data.remove(index);
-    }
-}
-
-class Float_column extends Column
-{   private List<Float> data = new ArrayList<>();
-    public Float_column(TYPE type, String name, boolean iskey)
-    {   super(type,name,iskey);
-    }
-    public String get(int index)
-    {   if (data.get(index)==null) return "null";
-        return data.get(index).toString();
-    }
-    public void add(String value)
-    {   if(value.equals("")) data.add(null);
-        else data.add(Float.valueOf(value));
-    }
-    public boolean contains(String value)
-    {   if(value.equals("")) return data.contains(null);
-        return data.contains(Float.valueOf(value));
-    }
-    public void remove(int index)
-    {   data.remove(index);
-    }
-}
-
-class Boolean_column extends Column
-{   private List<Boolean> data = new ArrayList<>();
-    public Boolean_column(TYPE type, String name, boolean iskey)
-    {   super(type,name,iskey);
-    }
-    public String get(int index)
-    {   if (data.get(index)==null) return "null";
-        return data.get(index).toString();
-    }
-    public void add(String value)
-    {   if(value.equals("")) data.add(null);
-        else data.add(String_handler.toboolean(value));
-    }
-    public boolean contains(String value)
-    {   if(value.equals("")) return data.contains(null);
-        return data.contains(String_handler.toboolean(value));
-    }
-    public void remove(int index)
-    {   data.remove(index);
-    }
-}
-
-//int out of range problem can be adressed
-class Int_column extends Column
-{   private List<Integer> data = new ArrayList<>();
-    public Int_column(TYPE type, String name, boolean iskey)
-    {   super(type,name,iskey);
-    }
-    public String get(int index)
-    {   if (data.get(index)==null) return "null";
-        return data.get(index).toString();
-    }
-    public void add(String value)
-    {   if(value.equals("")) data.add(null);
-        else data.add(Integer.decode(value));
-    }
-    public boolean contains(String value)
-    {   if(value.equals("")) return data.contains(null);
-        return data.contains(Integer.decode(value));
-    }
-    public void remove(int index)
-    {   data.remove(index);
-    }
 }
