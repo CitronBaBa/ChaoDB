@@ -3,17 +3,19 @@ import java.io.*;
 
 /* Do the job of saving tables to a folder with individual table file
    using Object/Object[] to make this class independent
-   from the object type, making it more reusable
+   from the storing type, making it more reusable
 */
 
 class FileSystem
 {   private String root = "./data/";
 
-    public void saveDatabase(String foldername, ArrayList<Object> tables, ArrayList<String> tablenames)
+// save a list of object with each individual file name
+// could be improved by using a map instead of two lists
+    public void saveDatabase(String foldername, ArrayList<Object> objects, ArrayList<String> tablenames)
     {   File dir = new File(root+foldername);
         dir.mkdir();
-        for (int i=0;i<tables.size();i++)
-        {   writeto(root+foldername+"/"+tablenames.get(i),tables.get(i));
+        for (int i=0;i<objects.size();i++)
+        {   writeto(root+foldername+"/"+tablenames.get(i),objects.get(i));
         }
         // delete file that is not in the lists
         for(File f : dir.listFiles())

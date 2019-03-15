@@ -1,11 +1,14 @@
 
-/* This is A selection of methods used to handle strings in database
+/* This is a selection of methods used to handle strings in database
    test methods are private non static;
    other methods are static to make it easier for others to call;
 */
 
 class String_handler
-{   public static TYPE typeRead(String userchoice)
+{
+// converting string input to Type
+// only (int float string boolean) are allowed
+    public static TYPE typeRead(String userchoice)
     {   if(userchoice.equals("int")) return TYPE.ints;
         if(userchoice.equals("float")) return TYPE.floats;
         if(userchoice.equals("string")) return TYPE.strings;

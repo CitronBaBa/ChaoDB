@@ -19,8 +19,10 @@ class Control
         return true;
     }
 
-    public void removeTable(String name)
-    {   tables.remove(name);
+    public boolean removeTable(String name)
+    {   if(!tables.containsKey(name)) return false;
+        tables.remove(name);
+        return true;
     }
 
     public Table getTable(String name)

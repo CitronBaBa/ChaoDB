@@ -14,34 +14,30 @@ public class Window extends Application
     private GridPane buttonGrid = new GridPane();
 
     private TextField tablenameField = new TextField();
+    private TextField delTablenameField = new TextField();
     private TextField LoadDbnameField = new TextField();
     private TextField SaveDbnameField = new TextField();
     private ArrayList<Button> tableBtns = new ArrayList<>();
 
     private TableHoverPanel tableglance;
     private Stage mainwindow;
-    private int x0 = 0, y0 = 1;
-    private int x = 0, y = 1;
+    private int x0 = 0, y0 = 2;
+    private int x = 0, y = 2;
 
     public static void main(String[] args)
     {   launch(args);
     }
 
     public void start(Stage window0)
-    {   topgrid.setPadding(new Insets(5,5,5,5));
-        topgrid.setVgap(5);
-        topgrid.setHgap(5);
-        buttonGrid.setPadding(new Insets(10,5,10,5));
-        buttonGrid.setVgap(5);
-        buttonGrid.setHgap(5);
-        buttonGrid.setId("GridPane_button");
+    {   gridSetUp();
 
-     // intial set-up
         addingButton();
+        deleteButton();
         loadingButton();
         savingButton();
 
         tableNameFiled();
+        delTableNameFiled();
         LoadDbNameField();
         SaveDbNameField();
 
@@ -70,9 +66,13 @@ public class Window extends Application
     private void hoverListen(Table table)
     {   if(tableglance!=null)
         {   if(tableglance.getTable().equals(table)) return;
-            layoutbox.getChildren().remove(tableglance.getpanel());
+            removeCurrentTablePanle();
         }
         displayTableHoverPanle(table);
+    }
+
+    private void removeCurrentTablePanle()
+    {   layoutbox.getChildren().remove(tableglance.getpanel());
     }
 
     private void displayTableHoverPanle(Table table)
@@ -80,10 +80,26 @@ public class Window extends Application
         layoutbox.getChildren().add(tableglance.getpanel());
     }
 
+    private void gridSetUp()
+    {   topgrid.setPadding(new Insets(5,5,5,5));
+        topgrid.setVgap(5);
+        topgrid.setHgap(5);
+        buttonGrid.setPadding(new Insets(10,5,10,5));
+        buttonGrid.setVgap(5);
+        buttonGrid.setHgap(5);
+        buttonGrid.setId("GridPane_button");
+    }
+
     private void tableNameFiled()
     {   tablenameField.setPromptText("Enter table name");
         GridPane.setConstraints(tablenameField,0,0,2,1);
         buttonGrid.getChildren().add(tablenameField);
+    }
+
+    private void delTableNameFiled()
+    {   delTablenameField.setPromptText("Enter table name");
+        GridPane.setConstraints(delTablenameField ,0,1,2,1);
+        buttonGrid.getChildren().add(delTablenameField );
     }
 
     private void LoadDbNameField()
@@ -101,10 +117,22 @@ public class Window extends Application
     private void addingButton()
     {   Button btn = new Button("Add Table");
         btn.setOnAction(e->
-        {   if(!addNewTable(tablenameField.getText())) return;
+        {   if(addNewTable(tablenameField.getText()))
             tablenameField.clear();
         });
         GridPane.setConstraints(btn,2,0);
+        buttonGrid.getChildren().add(btn);
+    }
+
+    private void deleteButton()
+    {   Button btn = new Button("Delete Table");
+        btn.setOnAction(e->
+        {   if(delTable(delTablenameField.getText()))
+            {   removeCurrentTablePanle();
+                tablenameField.clear();
+            }
+        });
+        GridPane.setConstraints(btn,2,1);
         buttonGrid.getChildren().add(btn);
     }
 
@@ -113,9 +141,9 @@ public class Window extends Application
         btn.setOnAction(e->
         {   if(!database.readfrom(LoadDbnameField.getText())) return;
             clearTableBtns();
-            LoadDbnameField.clear();
             loadfromDatabase();
             updateDatabaseName();
+            LoadDbnameField.clear();
         });
         GridPane.setConstraints(btn,2,1);
         topgrid.getChildren().add(btn);
@@ -156,16 +184,25 @@ public class Window extends Application
         return true;
     }
 
+    private boolean delTable(String name)
+    {   if(database.removeTable(name))
+        {   clearTableBtns();
+            loadfromDatabase();
+            return true;
+        }
+        return false;
+    }
+
     private Button tableButton(String name, Table table)
     {   Button btn = new Button(name);
         tableBtns.add(btn);
         btn.setStyle("-fx-text-fill: rgb(88,144,255); -fx-font-weight: bold;");
-        btn.setMaxWidth(120);
+        btn.setPrefWidth(90);
         btn.setOnAction(e->
         {   TableWindow newview = new TableWindow(table);
             newview.launch();
             // refrash the table hover panel
-            layoutbox.getChildren().remove(tableglance.getpanel());
+            removeCurrentTablePanle();
             displayTableHoverPanle(table);
         });
         hoverlisten(btn,table);
@@ -175,7 +212,7 @@ public class Window extends Application
 
     private void clearTableBtns()
     {   for(Button btn : tableBtns)
-        {   topgrid.getChildren().remove(btn);
+        {   buttonGrid.getChildren().remove(btn);
         }
         x=x0; y=y0;
     }
