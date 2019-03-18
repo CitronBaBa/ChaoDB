@@ -7,6 +7,16 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.beans.value.*;
 
+/* the main window of the program
+   has the ability to: save/load to/from a database
+                       add/delete table
+                       have a peek on any table
+   the layout is organized by a VBox of:
+            topgrid - buttongrid - tableview(when a table button is hovered)
+   when launched it is set to load a "demo" database by default
+*/
+
+// some objects are made global for others to retrieve information and do operations
 public class Window extends Application
 {   private Control database = new Control("Untitled");
     private VBox layoutbox = new VBox();
@@ -21,6 +31,8 @@ public class Window extends Application
 
     private TableHoverPanel tableglance;
     private Stage mainwindow;
+
+// used to auto-organized the table buttons in the buttongrid
     private int x0 = 0, y0 = 2;
     private int x = 0, y = 2;
 
@@ -53,6 +65,7 @@ public class Window extends Application
         tableDemoInit();
     }
 
+// add a hover listener to a table button
     private void hoverlisten(Button btn, Table table)
     {   btn.hoverProperty().addListener
         ((ObservableValue<? extends Boolean> observable, Boolean oldhovered, Boolean newhovered)
@@ -63,6 +76,7 @@ public class Window extends Application
         );
     }
 
+// remove the old one if a different table is hovered, and display the new one
     private void hoverListen(Table table)
     {   if(tableglance!=null)
         {   if(tableglance.getTable().equals(table)) return;
@@ -80,6 +94,7 @@ public class Window extends Application
         layoutbox.getChildren().add(tableglance.getpanel());
     }
 
+// grid set-up
     private void gridSetUp()
     {   topgrid.setPadding(new Insets(5,5,5,5));
         topgrid.setVgap(5);
@@ -90,6 +105,7 @@ public class Window extends Application
         buttonGrid.setId("GridPane_button");
     }
 
+// further abstraction could be implemented
     private void tableNameFiled()
     {   tablenameField.setPromptText("Enter table name");
         GridPane.setConstraints(tablenameField,0,0,2,1);
@@ -114,6 +130,7 @@ public class Window extends Application
         topgrid.getChildren().add(SaveDbnameField);
     }
 
+// try add a table when clikced using the name entered
     private void addingButton()
     {   Button btn = new Button("Add Table");
         btn.setOnAction(e->
@@ -124,18 +141,24 @@ public class Window extends Application
         buttonGrid.getChildren().add(btn);
     }
 
+// try deleting the table when clikced
+// remove the peek view of the table in a special situation
+// where the table is being displayed and then deleted at the same time
     private void deleteButton()
     {   Button btn = new Button("Delete Table");
         btn.setOnAction(e->
-        {   if(delTable(delTablenameField.getText()))
-            {   removeCurrentTablePanle();
-                tablenameField.clear();
+        {   String name = delTablenameField.getText();
+            if(delTable(name))
+            {   if(tableglance.getTable().getname().equals(name)) removeCurrentTablePanle();
+                delTablenameField.clear();
             }
         });
         GridPane.setConstraints(btn,2,1);
         buttonGrid.getChildren().add(btn);
     }
 
+// try load the table specified by the name entered by user
+// if successful, rewind and reload all the new information to the window
     private void loadingButton()
     {   Button btn = new Button("Load From");
         btn.setOnAction(e->
@@ -149,6 +172,7 @@ public class Window extends Application
         topgrid.getChildren().add(btn);
     }
 
+// try save the database to disk using the entered name, if successful update the window name
     private void savingButton()
     {   Button btn = new Button("Save As");
         btn.setOnAction(e->
@@ -160,30 +184,12 @@ public class Window extends Application
         topgrid.getChildren().add(btn);
     }
 
+//update window name
     private void updateDatabaseName()
     {   mainwindow.setTitle("ChaoDB: "+database.getname());
     }
 
-    private void addtogrid(Button btn)
-    {   GridPane.setConstraints(btn,x,y);
-        positioning();
-        buttonGrid.getChildren().add(btn);
-    }
-
-    private void positioning()
-    {   if(x>1)
-        {   y++;
-            x=0;
-        }
-        else x++;
-    }
-
-    private boolean addNewTable(String name)
-    {   if(!database.addTable(name)) return false;
-        tableButton(name,database.getTable(name));
-        return true;
-    }
-
+//try deleting table in model & view, the latter is done using a shortcut by redo everything
     private boolean delTable(String name)
     {   if(database.removeTable(name))
         {   clearTableBtns();
@@ -193,7 +199,14 @@ public class Window extends Application
         return false;
     }
 
-    private Button tableButton(String name, Table table)
+//try adding a new table with the name entered
+    private boolean addNewTable(String name)
+    {   if(!database.addTable(name)) return false;
+        addtableButton(name,database.getTable(name));
+        return true;
+    }
+
+    private Button addtableButton(String name, Table table)
     {   Button btn = new Button(name);
         tableBtns.add(btn);
         btn.setStyle("-fx-text-fill: rgb(88,144,255); -fx-font-weight: bold;");
@@ -210,6 +223,22 @@ public class Window extends Application
         return btn;
     }
 
+// add table button to the grid, automatically adjust the position
+    private void addtogrid(Button btn)
+    {   GridPane.setConstraints(btn,x,y);
+        positioning();
+        buttonGrid.getChildren().add(btn);
+    }
+
+    private void positioning()
+    {   if(x>1)
+        {   y++;
+            x=0;
+        }
+        else x++;
+    }
+
+// clear up the window, remove all the table buttons
     private void clearTableBtns()
     {   for(Button btn : tableBtns)
         {   buttonGrid.getChildren().remove(btn);
@@ -217,12 +246,14 @@ public class Window extends Application
         x=x0; y=y0;
     }
 
+//load all the tables to table buttons
     private void loadfromDatabase()
     {   for(Table t : database.getAllTables())
-        {   tableButton(t.getname(),t);
+        {   addtableButton(t.getname(),t);
         }
     }
 
+// load demo database
     private void tableDemoInit()
     {   if(!database.readfrom("demo")) return;
         loadfromDatabase();

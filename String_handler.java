@@ -1,10 +1,10 @@
 
-/* This is a selection of methods used to handle strings in database
+/* This is a selection of methods used to handle strings in the database
    test methods are private non static;
-   other methods are static to make it easier for others to call;
+   other methods are public static to make it easier for others to call;
 */
 
-class String_handler
+public class String_handler
 {
 // converting string input to Type
 // only (int float string boolean) are allowed
@@ -24,7 +24,8 @@ class String_handler
         return null;
     }
 
-// process input string, such as (1,Lucy,1996,true), into a string array
+// process input string, such as (1,Lucy,1996,true), into a string array for row entry in the table
+// could be prettified using regular expression
     public static String[] processRowEntry(String values)
     {   if(values.charAt(0)!='(' || values.charAt(values.length()-1)!=')') return null;
         String[] entrys = values.split(",");
@@ -34,6 +35,8 @@ class String_handler
         return entrys;
     }
 
+// currently database name and table name have the same format
+// these two functions are there to faciliate later possible changes
     public static boolean judgeDbName(String name)
     {   return judgeName(name);
     }
@@ -48,6 +51,13 @@ class String_handler
         return true;
     }
 
+ // infer the data type from a string value
+ // "0." ".0" are not considered as float
+ // "22" '132' are only considered as int
+ // "+" "-" are considered to allow negative inputs
+ // int overflow problem is addressed
+ // float boundary is not judged, will be converted to float with less precision
+
     public static TYPE typeJudge(String value)
     {   boolean num = true;
         boolean inte = true;
@@ -56,6 +66,7 @@ class String_handler
         int decimalcount=0;
         char a;
 
+        if(value.equals("")) return null;
         if(value.equals("true")) return TYPE.booleans;
         if(value.equals("false")) return TYPE.booleans;
 
@@ -79,6 +90,7 @@ class String_handler
         return TYPE.strings;
     }
 
+//deal with int over flow problem
     private static boolean intOverFlow(String value, boolean positive)
     {   String max = "2147483647";
         if(!positive) max = "2147483648";
@@ -90,6 +102,8 @@ class String_handler
         return false;
     }
 
+// change a string value to boolean
+// only after it's type is already inferred as TYPE.booleans
     public static boolean toboolean(String value)
     {   if(value.equals("true")) return true;
         else return false;

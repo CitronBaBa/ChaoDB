@@ -1,12 +1,19 @@
 import java.util.*;
 import java.io.*;
 
+/*  Column has all the information about one column in the table
+    Types are implemented using inheritance, and a TYPE enum
+    each children has a arraylist of data with its specific type
+    so that the actual figure is stored in real int/float/etc.. instead of just string
+    it also has TYPE enum to specifiy the type of data it is storing
+    so later inputs' type compliance can be checked
+*/
+
 public class Column implements Serializable
 {   private static final long serialVersionUID = 1000L;
     private TYPE type;
     private String name;
     private boolean iskey;
-    private List data;
 
     Column(TYPE type, String name, boolean iskey)
     {   this.type = type;
@@ -26,6 +33,7 @@ public class Column implements Serializable
     {   return iskey;
     }
 
+//check whether the input has the same type with this coulmn's type
     public boolean typecheck(String value)
     {   // null item handling
         if(value.equals(""))
@@ -43,14 +51,14 @@ public class Column implements Serializable
         return true;
     }
 
-// check whether new value can be a unique key
+// check whether new value is unique if there is a key constrain
     public boolean newKeyCheck(String value)
     {   if(!iskey)return true;
         if(contains(value)) return false;
         return true;
     }
 
-// check whether the whole column has no duplicate value
+// check whether the whole column has no duplicate value, if there is a key constrain
     public boolean keyConstrainCheck()
     {   List datalist = giveData();
         if(!iskey) return true;
@@ -64,6 +72,10 @@ public class Column implements Serializable
         return true;
     }
 
+/* giveData() method is only used to override and to give different list of data for
+   key constrain check within the column class, should never be used by outside class
+   it is a way around to "override parent field" */
+   
     public List giveData(){   return null; };
     public String get(int index){ return null; } ;
     public void add(String vale){};
@@ -88,6 +100,8 @@ public class Column implements Serializable
         assert(testCol.newKeyCheck("fish")==false);
         assert(testCol.newKeyCheck("oyster")==true);
     }
+
+// each class implements a data type and modify the way it deals with string input
 
     static class StringColumn extends Column
     {   private static final long serialVersionUID = 1000L;
@@ -161,7 +175,6 @@ public class Column implements Serializable
         public List giveData(){   return this.data; };
     }
 
-    //int out of range problem can be adressed
     static class IntColumn extends Column
     {   private static final long serialVersionUID = 1000L;
         private List<Integer> data = new ArrayList<>();

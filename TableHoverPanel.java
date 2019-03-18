@@ -10,6 +10,10 @@ import javafx.scene.control.cell.*;
 import javafx.beans.value.*;
 import javafx.beans.property.*;
 
+/*  when your mouse hovering each table button in the main window
+    this class is used and create a peek of this table
+    by creaing a small tableview containg all the descriptive information about columns in table
+*/
 public class TableHoverPanel
 {   Table tablehovered;
     TableView<ColumnEntry> panel = new TableView<>();
@@ -21,6 +25,8 @@ public class TableHoverPanel
     public TableView getpanel() {   return panel;}
     public Table getTable() {   return tablehovered;}
 
+// fill the panle with three viewcolumns to describe a database column in the table
+// load the actual information from table
     private void loadTableToPanel()
     {   TableColumn<ColumnEntry,String> nameColumn = new TableColumn<>("Variable name");
         nameColumn.setCellValueFactory(cell-> new SimpleObjectProperty<>(cell.getValue().getName()));
@@ -37,7 +43,7 @@ public class TableHoverPanel
         panel.setItems(loadDataFromTable());
     }
 
-//could be simplified
+// load data from table to a list
     private ObservableList<TableHoverPanel.ColumnEntry> loadDataFromTable()
     {   ObservableList<TableHoverPanel.ColumnEntry> colEntries = FXCollections.observableArrayList();
         for(int i=0;i<tablehovered.getwidth();i++)
@@ -49,6 +55,7 @@ public class TableHoverPanel
         return colEntries;
     }
 
+// a buffer class represent a row in a panel
     private static class ColumnEntry
     {   private String name;
         private String type;

@@ -1,7 +1,6 @@
 jfx = --module-path FX/lib --add-modules=javafx.controls
 default: Window
-Control:
-	javac $@.java Table.java String_handler.java TYPE.java
+
 FileSystem:
 	javac $@.java Table.java String_handler.java TYPE.java
 	java -ea FileSystem
@@ -14,6 +13,7 @@ Column:
 String_handler:
 	javac $@.java TYPE.java
 	java -ea String_handler
+	
 Window:
 	javac $@.java TableWindow.java TableHoverPanel.java Control.java Table.java Column.java String_handler.java TYPE.java $(jfx)
 	java $(jfx) $@

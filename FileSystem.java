@@ -6,7 +6,7 @@ import java.io.*;
    from the storing type, making it more reusable
 */
 
-class FileSystem
+public class FileSystem
 {   private String root = "./data/";
 
 // save a list of object with each individual file name
@@ -24,6 +24,7 @@ class FileSystem
         }
     }
 
+// read from a folder(a database) and return the list of objects (tables) read in
     public Object[] readDatabase(String foldername)
     {   File dir = new File(root+foldername);
         if(!dir.exists()) return null;
@@ -36,6 +37,7 @@ class FileSystem
         return result;
     }
 
+// delete a folder and all its inner file
     public void deleteDatabase(String foldername)
     {   File dir = new File(root+foldername);
         for(File f : dir.listFiles())
@@ -43,7 +45,7 @@ class FileSystem
         }
         dir.delete();
     }
-
+// read from a file, return the object read in
     public Object readfrom(String filename)
     {   FileInputStream file0 = null;
         Object targetobject = null;
@@ -65,7 +67,8 @@ class FileSystem
         return targetobject;
      }
 
-    public <T> void writeto(String filename, T targetobject)
+// write an object to a file
+    public void writeto(String filename, Object targetobject)
     {   FileOutputStream file0 = null;
         try
         {   File newfile = new File(filename);
@@ -96,6 +99,7 @@ class FileSystem
         singleTest();
     }
 
+// test write and read a single object
     private void singleTest()
     {   Testclass cecile = new Testclass("Cecile");
         writeto("file2",cecile);
@@ -106,6 +110,7 @@ class FileSystem
         testfile.delete();
     }
 
+// test write/read a group of objects
     private void groupTest()
     {   Testclass[] listofTestclass = testPreparation();
         assert(listofTestclass[0].name.equals("Cecile"));
@@ -130,16 +135,18 @@ class FileSystem
         }
         return listofpeople;
     }
-}
 
-// class for testing
-class Testclass implements Serializable
-{   public String name;
-    public Testsubclass subclass = new Testsubclass();
-    Testclass(String name)
-    {   this.name = name;
+// classes for testing
+// each time they are created and deleted, no need to specify serialVersionUID
+    static class Testclass implements Serializable
+    {   public String name;
+        public FileSystem.Testsubclass subclass = new FileSystem.Testsubclass();
+        Testclass(String name)
+        {   this.name = name;
+        }
     }
-}
-class Testsubclass implements Serializable
-{   public String name = "inteli";
+    static class Testsubclass implements Serializable
+    {   public String name = "inteli";
+    }
+
 }

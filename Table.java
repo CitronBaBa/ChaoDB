@@ -1,7 +1,13 @@
 import java.util.*;
 import java.io.*;
 
-class Table implements Serializable
+/*  Table contains an array of columns, the data type of one column can be specified
+    later on using inheritance.
+    it records the size(the number of rows) and the width(the number of columns).
+    it has a tiny commandline mode to test the row entry when you use java Table enter
+    it is Serializable, so it can be write to disk as an object
+*/
+public class Table implements Serializable
 {   private static final long serialVersionUID = 1000L;
     private List<Column> lib = new LinkedList<>();
     private int size = 0;
@@ -27,6 +33,7 @@ class Table implements Serializable
     {   return lib.get(index).iskey();
     }
 
+// return a List of string for a particular row of the input index
     public List<String> query(int index)
     {   if(index>size)
         {   System.out.println("query index is out of range");
@@ -40,6 +47,7 @@ class Table implements Serializable
         return answer;
     }
 
+// remove a particular row identified by the index
     public void deleteRow(int index)
     {   for(Column c: lib)
         {   c.remove(index);
@@ -47,12 +55,14 @@ class Table implements Serializable
         size--;
     }
 
+// judge the type,iskey information from the input choice string
+// then add a column in the table according to the type entered
     public boolean addColumn(String typechoice, String col_name, String iskeychoice)
     {   if(String_handler.typeJudge(iskeychoice)!=TYPE.booleans) return false;
         Boolean iskey = String_handler.toboolean(iskeychoice);
 
         //empty key field column cannot be added afterwards
-        if(iskey && size>0) return false;
+        if(iskey && size>1) return false;
 
         TYPE type = String_handler.typeRead(typechoice);
         if(type==null) return false;
@@ -73,6 +83,7 @@ class Table implements Serializable
         return true;
     }
 
+//delete the last column
     public boolean delColumn()
     {   if(width<1) return false;
         lib.remove(width-1);
@@ -80,13 +91,15 @@ class Table implements Serializable
         return true;
     }
 
+// check whehter all column comply with key
+// currently not used since every input is already checked by the next function
     private boolean rowKeyConstrainCheck()
     {   for(Column c : lib)
         {   if(!c.keyConstrainCheck()) return false;
         }
         return true;
     }
-
+// check whehter a new input row comply with the key constrain
     private boolean rowNewKeycheck(String[] values)
     {   for(int i=0;i<width;i++)
         {   Column c = lib.get(i);
@@ -94,7 +107,8 @@ class Table implements Serializable
         }
         return true;
     }
-
+// check type/key then enter a row
+// input is specified and processed using the format "(input1,input2,input3,etc..)"
     public boolean rowEntry(String values)
     {   String[] entrys = String_handler.processRowEntry(values);
         if(entrys == null) return false;
@@ -110,7 +124,7 @@ class Table implements Serializable
         return true;
     }
 
-
+// check whether all the inputs in a row has the right type, before writing any of them down
     private boolean rowTypecheck(String entrys[])
     {   int i = 0;
         for(Column c : lib)
@@ -123,6 +137,7 @@ class Table implements Serializable
         return true;
     }
 
+// write input row into columns
     private void rowWrite(String entrys[])
     {   int i = 0;
         for(Column c : lib)
@@ -132,6 +147,7 @@ class Table implements Serializable
         size++;
     }
 
+// a tiny command line mode to enter row data
     private void commandLineMode()
     {   addColumn("int","lobster","false");
         addColumn("string","basil","false");
@@ -146,6 +162,7 @@ class Table implements Serializable
         }
     }
 
+// comand line printing
     private void printTable()
     {   for(int i=0;i<size;i++)
         {   System.out.print("  ");
@@ -156,6 +173,7 @@ class Table implements Serializable
         }
     }
 
+//testing & switch to commandlinemode
     public static void main(String[] args)
     {   if(args.length!=0)
         {   Table t = new Table("testcmd");
